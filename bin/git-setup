@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function askYesNo {
+        QUESTION=$1
+        DEFAULT=$2
+        if [ "$DEFAULT" = true ]; then
+                OPTIONS="[Y/n]"
+                DEFAULT="y"
+            else
+                OPTIONS="[y/N]"
+                DEFAULT="n"
+        fi
+        read -p "$QUESTION $OPTIONS " -n 1 -s -r INPUT
+        INPUT=${INPUT:-${DEFAULT}}
+        echo ${INPUT}
+        if [[ "$INPUT" =~ ^[yY]$ ]]; then
+            ANSWER=true
+        else
+            ANSWER=false
+        fi
+}
+
+# Install Git and Github
+
+echo "Installing Git, Github and SSH"
+sudo pacman -Sy git github-cli openssh --noconfirm 
+
+# Set name and email for git 
+
+echo "Setting name to Parax"
+git config --global user.name "Parax"
+echo "Setting email to incubusnb@gmail.com"
+git config --global user.email "incubusnb@gmail.com"
+
+# Set default branch to main
+
+echo "Setting default branch to main"
+git config --global init.defaultBranch main
+
+# set core editor
+
+echo "Setting defualt editor to NeoVIM"
+git config --global core.editor nvim
+
+# Set git to prune when fetching
+
+echo "Setting git to prune when fetching"
+git config --global fetch.prune true
+
+# Check for existing ssh keys
+
+#echo "Checking for existing ed25519 SSH Keys on system"
+#if [ -f ~/.ssh/id_ed25519.pub] then
+#    echo "ed25519 Key exists"
+#    echo "exiting script"
+#    exit 1 
+#fi
+
+# Generate ssh key
+
+echo "Generating SSH Key"
+ssh-keygen -t ed25519 -C "incubusnb@gmail.com" -f ~/.ssh/id_ed25519 -N ""
+
+# Add Key to ssh-agent
+
+echo "Starting ssh-agent and adding key"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# Authorize Github
+
+echo "Logging in to Github.com"
+gh auth login --git-protocol ssh --with-token < git-token 
+
+# Add key to Github
+
+ gh ssh-key add ~/.ssh/id_ed25519.pub --title "Testing"
+
+gh config set git_protocol ssh
+
+
+
+
+
+
+

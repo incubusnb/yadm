@@ -1,0 +1,33 @@
+general {
+        colors = true
+        interval = 1
+}
+
+order += "ethernet enp33s0"
+order += "disk /home"
+order += "cpu_usage"
+order += "memory"
+order += "tztime local"
+
+ethernet enp33s0 {
+        format_up = "E: %ip (%speed)"
+        format_down = "E: down"
+}
+
+disk "/home" {
+        format = "%avail"
+}
+
+memory {
+        format = "%used | %available"
+        threshold_degraded = "1G"
+        format_degraded = "MEMORY < %available"
+}
+
+tztime local {
+        format = "%Y-%m-%d %I:%M:%S"
+}
+
+cpu_usage {
+	format = "CPU: %usage" 
+}
